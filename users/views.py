@@ -1,8 +1,10 @@
 
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
+
+from users.forms import UserForm
 from users.models import User
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from rest_framework import status
 from rest_framework import permissions
@@ -24,7 +26,13 @@ from rest_framework_simplejwt.views import (
 
 class UserView(APIView):
     def get(self, request):
-        return Response({"message": "get 요청합니다!"})
+        user = request.user.is_authenticated
+        if user:
+            return redirect('/')
+        else:
+            my_form = UserForm()  # 유저 폼을 가져옴
+            return render(request, 'user/signup.html', {'form': my_form})
+        #eturn Response({"message": "get 요청합니다!"})
 
     def post(self, request):
         serializer = UserSerializer(data=request.data)
